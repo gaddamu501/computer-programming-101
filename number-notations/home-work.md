@@ -19,3 +19,11 @@
 **Real Numbers** - The set of Rational Numbers with the set of Irrational Numbers adjoined.
 
 **Complex Number** - A number which can be written in the form a + bi where a and b are real numbers and i is the square root of -1.
+
+## Binary Representation
+
+**How many digits are required to represent 26 English alphabets?**
+
+**Why do computers use binary (0s and 1s) instead of decimal (0-9) like humans use?**
+
+**How would you represent a negative number like -5 in binary? What are the challenges?**
