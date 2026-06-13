@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Binary, Decimal, and Hexadecimal Practice</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #fff;
+      --text: #000;
+      --border: #000;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      overflow: hidden;
+    }
+
+    .deck {
+      width: 100vw;
+      height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      height: 100%;
+      padding: 3vh 3vw 7vh;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5vh;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(42px, 5vw, 74px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(22px, 2vw, 34px);
+      line-height: 1.15;
+    }
+
+    .notation-guide {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1vw;
+    }
+
+    .note {
+      border: 2px solid var(--border);
+      padding: 1vh 1vw;
+      color: var(--text);
+      font-size: clamp(15px, 1.25vw, 23px);
+      line-height: 1.18;
+    }
+
+    .note strong {
+      display: block;
+      margin-bottom: 0.35vh;
+      font-size: clamp(18px, 1.55vw, 28px);
+    }
+
+    .note span {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.5vw;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .group {
+      border: 3px solid var(--border);
+      padding: 1vh 1vw;
+      min-width: 0;
+    }
+
+    h2 {
+      margin: 0 0 1vh;
+      padding-bottom: 0.8vh;
+      border-bottom: 3px solid var(--border);
+      color: var(--text);
+      font-size: clamp(26px, 2.6vw, 42px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    ol {
+      margin: 0;
+      padding-left: 1.45em;
+      color: var(--text);
+      font-size: clamp(18px, 1.55vw, 28px);
+      line-height: 1.16;
+    }
+
+    li {
+      margin: 0.28vh 0;
+      padding-left: 0.15em;
+    }
+
+    code {
+      color: var(--text);
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 700;
+    }
+
+    .controls {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1vh 2vw;
+      background: var(--bg);
+      border-top: 2px solid var(--border);
+      color: var(--text);
+      font-size: 22px;
+    }
+
+    button {
+      appearance: none;
+      border: 2px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font: inherit;
+      padding: 0.35em 0.75em;
+      cursor: pointer;
+    }
+
+    button:focus {
+      outline: 4px solid var(--border);
+      outline-offset: 3px;
+    }
+
+    .counter {
+      font-weight: 700;
+    }
+
+    .lock-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      align-items: center;
+      justify-content: center;
+      padding: 4vw;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .lock-screen.active {
+      display: flex;
+    }
+
+    .lock-panel {
+      width: min(760px, 100%);
+      border: 4px solid var(--border);
+      padding: 4vh 4vw;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .lock-panel h2 {
+      border-bottom: 0;
+      margin-bottom: 1vh;
+      padding-bottom: 0;
+      font-size: clamp(36px, 4vw, 64px);
+    }
+
+    .lock-panel p,
+    .lock-error {
+      font-size: clamp(22px, 2vw, 34px);
+      line-height: 1.25;
+    }
+
+    .lock-row {
+      display: flex;
+      gap: 1vw;
+      margin-top: 3vh;
+    }
+
+    .lock-row input {
+      flex: 1;
+      min-width: 0;
+      border: 3px solid var(--border);
+      padding: 0.5em;
+      background: var(--bg);
+      color: var(--text);
+      font: inherit;
+      font-size: clamp(24px, 2.5vw, 40px);
+    }
+
+    .lock-error {
+      min-height: 1.3em;
+      margin-top: 2vh;
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        overflow: auto;
+      }
+
+      .deck {
+        height: auto;
+        min-height: 100vh;
+      }
+
+      .slide,
+      .slide.active {
+        min-height: 100vh;
+        height: auto;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .notation-guide {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        position: sticky;
+      }
+    }
+
+    @media print {
+      body {
+        overflow: visible;
+      }
+
+      .deck {
+        height: auto;
+      }
+
+      .slide,
+      .slide.active {
+        display: flex;
+        page-break-after: always;
+        height: 100vh;
+      }
+
+      .controls {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-live="polite">
+    <section class="slide active" aria-label="Questions">
+      <h1>Questions</h1>
+      <p class="subtitle">Convert each number into the requested notation.</p>
+
+      <div class="notation-guide" aria-label="Number notation guide">
+        <div class="note">
+          <strong>Binary</strong>
+          <span><b>What:</b> only 0 and 1. <b>Why:</b> computers use on/off signals. <b>When:</b> memory, circuits, and low-level data.</span>
+        </div>
+        <div class="note">
+          <strong>Decimal</strong>
+          <span><b>What:</b> digits 0-9. <b>Why:</b> it is our everyday counting system. <b>When:</b> normal math, prices, scores, and quantities.</span>
+        </div>
+        <div class="note">
+          <strong>Hexadecimal</strong>
+          <span><b>What:</b> 0-9 and A-F. <b>Why:</b> it shortens long binary numbers. <b>When:</b> colors, memory addresses, and debugging.</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <section class="group">
+          <h2>Binary</h2>
+          <ol>
+            <li><code>1101</code> to decimal</li>
+            <li><code>10110</code> to decimal</li>
+            <li><code>111001</code> to decimal</li>
+            <li><code>100101</code> to decimal</li>
+            <li><code>1010110</code> to decimal</li>
+            <li><code>11110000</code> to decimal</li>
+            <li><code>10011010</code> to hexadecimal</li>
+            <li><code>11101101</code> to hexadecimal</li>
+            <li><code>101010101</code> to hexadecimal</li>
+            <li><code>11111111</code> to decimal and hexadecimal</li>
+          </ol>
+        </section>
+
+        <section class="group">
+          <h2>Decimal</h2>
+          <ol>
+            <li><code>18</code> to binary</li>
+            <li><code>27</code> to binary</li>
+            <li><code>42</code> to binary</li>
+            <li><code>64</code> to binary</li>
+            <li><code>99</code> to binary</li>
+            <li><code>128</code> to binary</li>
+            <li><code>156</code> to hexadecimal</li>
+            <li><code>200</code> to hexadecimal</li>
+            <li><code>255</code> to binary and hexadecimal</li>
+            <li><code>1024</code> to binary and hexadecimal</li>
+          </ol>
+        </section>
+
+        <section class="group">
+          <h2>Hexadecimal</h2>
+          <ol>
+            <li><code>A</code> to decimal and binary</li>
+            <li><code>1F</code> to decimal and binary</li>
+            <li><code>2A</code> to decimal</li>
+            <li><code>3C</code> to binary</li>
+            <li><code>7B</code> to decimal</li>
+            <li><code>80</code> to decimal and binary</li>
+            <li><code>9F</code> to decimal</li>
+            <li><code>B4</code> to binary</li>
+            <li><code>FF</code> to decimal and binary</li>
+            <li><code>100</code> to decimal and binary</li>
+          </ol>
+        </section>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Answers">
+      <h1>Answers</h1>
+      <p class="subtitle">Use this slide to review or self-check.</p>
+
+      <div class="notation-guide" aria-label="Number notation guide">
+        <div class="note">
+          <strong>Binary</strong>
+          <span><b>What:</b> only 0 and 1. <b>Why:</b> computers use on/off signals. <b>When:</b> memory, circuits, and low-level data.</span>
+        </div>
+        <div class="note">
+          <strong>Decimal</strong>
+          <span><b>What:</b> digits 0-9. <b>Why:</b> it is our everyday counting system. <b>When:</b> normal math, prices, scores, and quantities.</span>
+        </div>
+        <div class="note">
+          <strong>Hexadecimal</strong>
+          <span><b>What:</b> 0-9 and A-F. <b>Why:</b> it shortens long binary numbers. <b>When:</b> colors, memory addresses, and debugging.</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <section class="group">
+          <h2>Binary</h2>
+          <ol>
+            <li><code>1101</code> = <code>13</code></li>
+            <li><code>10110</code> = <code>22</code></li>
+            <li><code>111001</code> = <code>57</code></li>
+            <li><code>100101</code> = <code>37</code></li>
+            <li><code>1010110</code> = <code>86</code></li>
+            <li><code>11110000</code> = <code>240</code></li>
+            <li><code>10011010</code> = <code>9A</code></li>
+            <li><code>11101101</code> = <code>ED</code></li>
+            <li><code>101010101</code> = <code>155</code></li>
+            <li><code>11111111</code> = <code>255</code> = <code>FF</code></li>
+          </ol>
+        </section>
+
+        <section class="group">
+          <h2>Decimal</h2>
+          <ol>
+            <li><code>18</code> = <code>10010</code></li>
+            <li><code>27</code> = <code>11011</code></li>
+            <li><code>42</code> = <code>101010</code></li>
+            <li><code>64</code> = <code>1000000</code></li>
+            <li><code>99</code> = <code>1100011</code></li>
+            <li><code>128</code> = <code>10000000</code></li>
+            <li><code>156</code> = <code>9C</code></li>
+            <li><code>200</code> = <code>C8</code></li>
+            <li><code>255</code> = <code>11111111</code> = <code>FF</code></li>
+            <li><code>1024</code> = <code>10000000000</code> = <code>400</code></li>
+          </ol>
+        </section>
+
+        <section class="group">
+          <h2>Hexadecimal</h2>
+          <ol>
+            <li><code>A</code> = <code>10</code> = <code>1010</code></li>
+            <li><code>1F</code> = <code>31</code> = <code>0001 1111</code></li>
+            <li><code>2A</code> = <code>42</code></li>
+            <li><code>3C</code> = <code>0011 1100</code></li>
+            <li><code>7B</code> = <code>123</code></li>
+            <li><code>80</code> = <code>128</code> = <code>1000 0000</code></li>
+            <li><code>9F</code> = <code>159</code></li>
+            <li><code>B4</code> = <code>1011 0100</code></li>
+            <li><code>FF</code> = <code>255</code> = <code>1111 1111</code></li>
+            <li><code>100</code> = <code>256</code> = <code>0001 0000 0000</code></li>
+          </ol>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <nav class="controls" aria-label="Slide controls">
+    <button type="button" id="previous">Previous</button>
+    <div class="counter" id="counter"></div>
+    <button type="button" id="next">Next</button>
+  </nav>
+
+  <div class="lock-screen" id="lockScreen" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+    <form class="lock-panel" id="lockForm">
+      <h2 id="lockTitle">Answers Locked</h2>
+      <p>Enter the course passcode to view the answer key.</p>
+      <div class="lock-row">
+        <input id="passcode" type="password" autocomplete="off" aria-label="Passcode">
+        <button type="submit">Unlock</button>
+      </div>
+      <div class="lock-error" id="lockError" aria-live="polite"></div>
+    </form>
+  </div>
+
+  <script>
+    const answerPasscode = "course-101";
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const counter = document.getElementById("counter");
+    const lockScreen = document.getElementById("lockScreen");
+    const lockForm = document.getElementById("lockForm");
+    const lockInput = document.getElementById("passcode");
+    const lockError = document.getElementById("lockError");
+    let currentSlide = 0;
+    let answersUnlocked = false;
+
+    function showSlide(index) {
+      if (index === 1 && !answersUnlocked) {
+        showLockScreen();
+        return;
+      }
+      currentSlide = Math.max(0, Math.min(index, slides.length - 1));
+      slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle("active", slideIndex === currentSlide);
+      });
+      counter.textContent = `Slide ${currentSlide + 1} of ${slides.length}`;
+    }
+
+    function showLockScreen() {
+      lockError.textContent = "";
+      lockInput.value = "";
+      lockScreen.classList.add("active");
+      setTimeout(() => lockInput.focus(), 0);
+    }
+
+    function hideLockScreen() {
+      lockScreen.classList.remove("active");
+    }
+
+    document.getElementById("previous").addEventListener("click", () => showSlide(currentSlide - 1));
+    document.getElementById("next").addEventListener("click", () => showSlide(currentSlide + 1));
+
+    lockForm.addEventListener("submit", event => {
+      event.preventDefault();
+      if (lockInput.value === answerPasscode) {
+        answersUnlocked = true;
+        hideLockScreen();
+        showSlide(1);
+        return;
+      }
+      lockError.textContent = "Incorrect passcode. Try again.";
+      lockInput.select();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && lockScreen.classList.contains("active")) {
+        hideLockScreen();
+        return;
+      }
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+        event.preventDefault();
+        showSlide(currentSlide + 1);
+      }
+      if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        event.preventDefault();
+        showSlide(currentSlide - 1);
+      }
+    });
+
+    showSlide(0);
+  </script>
+</body>
+</html>
